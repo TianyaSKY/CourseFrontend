@@ -1,0 +1,67 @@
+{
+	"pages": [
+		{
+			"path": "pages/schedule/schedule",
+			"style": {
+				"navigationBarTitleText": "课表",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/mine/mine",
+			"style": {
+				"navigationBarTitleText": "我的",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/mine/edit-profile",
+			"style": {
+				"navigationBarTitleText": "修改个人信息",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/schedule/timetable-manage",
+			"style": {
+				"navigationBarTitleText": "课表管理",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/schedule/timetable-edit",
+			"style": {
+				"navigationBarTitleText": "课表编辑",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/schedule/course-manage",
+			"style": {
+				"navigationBarTitleText": "课程管理",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/schedule/course-library",
+			"style": {
+				"navigationBarTitleText": "课程库",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/schedule/schedule-edit",
+			"style": {
+				"navigationBarTitleText": "排课编辑",
+				"navigationStyle": "custom"
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "Schedule",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8"
+	},
+	"uniIdRouter": {}
+}

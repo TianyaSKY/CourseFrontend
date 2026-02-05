@@ -1,0 +1,9 @@
+{
+  "name": "course",
+  "version": "1.0.0",
+  "description": "Course Schedule Management",
+  "scripts": {
+    "dev:h5": "uni",
+    "build:h5": "uni build"
+  }
+}
