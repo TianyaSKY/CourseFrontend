@@ -1,7 +1,7 @@
 <template>
 	<view class="page">
 		<!-- 课表页独享工具栏 -->
-		<schedule-header :timetable="currentTimetable" @import="handleImport" @share="handleHeaderShare"></schedule-header>
+		<schedule-header :timetable="currentTimetable" :current-view-date="currentViewDate" @import="handleImport" @share="handleHeaderShare"></schedule-header>
 
 		<!-- 内容区域 -->
 		<scroll-view class="content" scroll-y="true">
@@ -189,7 +189,7 @@
 </template>
 
 <script setup>
-	import { ref } from 'vue'
+	import { ref, computed } from 'vue'
 	import { onShow } from '@dcloudio/uni-app'
 	import { getDefaultTimetable, importTimetableImages, importTimetableJson, importTimetableText, acceptShare, shareTimetable } from '@/functions/timetable.js'
 	import { getDefaultTimetableCourses } from '@/functions/timetable-course.js'
@@ -211,6 +211,11 @@
 	const tempFilePath = ref('')
 	const termStartDate = ref('')
 	const currentWeekMonday = ref('')
+	
+	// Pass this to header to display the correct week relative to view
+	const currentViewDate = computed(() => {
+		return currentWeekMonday.value || new Date().toISOString().split('T')[0]
+	})
 	
 	// Share related (Output)
 	const showShareOutputModal = ref(false)
@@ -528,7 +533,7 @@
 		display: flex;
 		flex-direction: column;
 		flex: 1;
-		background-color: #f1f3f8;
+		background-color: #dae4f5;
 	}
 
 	.content {

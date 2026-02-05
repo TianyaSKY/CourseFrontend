@@ -1,30 +1,35 @@
 <template>
 	<view class="header-container">
-		<!-- 状态栏占位 -->
+		<!-- Status Bar Placeholder -->
 		<view class="status-bar"></view>
 		
 		<view class="header">
 			<view class="date-block">
 				<text class="date">{{ currentDate }}</text>
 				<view class="timetable-info">
-					<text class="timetable-name">{{ timetable?.name || '未设置课表' }}</text>
-					<text class="week-status" v-if="timetable">
-						({{ timetable.academicYearStart }}-{{ timetable.academicYearEnd }} 第 {{ timetable.term }} 学期)
-					</text>
+					<block v-if="timetable">
+						<text class="week-status" v-if="currentWeek > 0">
+							第 {{ currentWeek }} 周 {{ timetable.name || '' }}
+						</text>
+						<text class="week-status" v-else>
+							假期中 {{ timetable.name || '' }}
+						</text>
+					</block>
+					<text class="week-status" v-else>未设置课表</text>
 				</view>
 			</view>
 			<view class="header-tools">
 				<view class="header-tool" @tap="handleToolClick('add')">
-					<uni-icons type="plus" size="22" color="#1d2130"></uni-icons>
+					<uni-icons type="plus" size="26" color="#1d2130"></uni-icons>
 				</view>
 				<view class="header-tool" @tap="handleToolClick('import')">
-					<uni-icons type="download" size="22" color="#1d2130"></uni-icons>
+					<uni-icons type="download" size="24" color="#1d2130"></uni-icons>
 				</view>
 				<view class="header-tool" @tap="handleToolClick('share')">
-					<uni-icons type="redo" size="22" color="#1d2130"></uni-icons>
+					<uni-icons type="redo" size="24" color="#1d2130"></uni-icons>
 				</view>
 				<view class="header-tool" @tap="handleToolClick('more')">
-					<uni-icons type="more-filled" size="22" color="#1d2130"></uni-icons>
+					<uni-icons type="more-filled" size="24" color="#1d2130"></uni-icons>
 				</view>
 			</view>
 		</view>
@@ -39,6 +44,10 @@
 		timetable: {
 			type: Object,
 			default: null
+		},
+		currentViewDate: {
+			type: String,
+			default: ''
 		}
 	})
 
@@ -61,11 +70,40 @@
 		const day = now.getDate()
 		return `${year}/${month}/${day}`
 	})
+	
+	const currentWeek = computed(() => {
+		if (!props.timetable?.termStartDate) return 1
+		
+		const termStart = new Date(props.timetable.termStartDate)
+		if (isNaN(termStart.getTime())) return 1
+		
+		// 1. Find the Monday of the term start week
+		// getDay(): 0 is Sunday, 1 is Monday...
+		// We want 1 (Mon) to be the start. 
+		// If Sun (0), treat as 7.
+		const day = termStart.getDay()
+		const diffToMonday = day === 0 ? 6 : day - 1
+		const termMonday = new Date(termStart)
+		termMonday.setDate(termStart.getDate() - diffToMonday)
+		termMonday.setHours(0, 0, 0, 0)
+		
+		// 2. Find "current" date (either today or the one user is viewing)
+		const targetDate = props.currentViewDate ? new Date(props.currentViewDate) : new Date()
+		if (isNaN(targetDate.getTime())) return 1
+		targetDate.setHours(0, 0, 0, 0)
+		
+		// 3. Calculate difference in weeks
+		const diffTime = targetDate.getTime() - termMonday.getTime()
+		const week = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 7)) + 1
+		
+		return week
+	})
 </script>
 
 <style scoped>
 	.header-container {
 		background-color: transparent;
+		padding-bottom: 10px;
 	}
 
 	.status-bar {
@@ -78,7 +116,7 @@
 		flex-direction: row;
 		justify-content: space-between;
 		align-items: flex-start;
-		padding: 16px 20px;
+		padding: 10px 20px;
 	}
 
 	.date-block {
@@ -87,10 +125,11 @@
 	}
 
 	.date {
-		font-size: 26px;
-		font-weight: 700;
+		font-size: 28px;
+		font-weight: 500;
 		color: #1d2130;
 		line-height: 1.2;
+		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 	}
 
 	.timetable-info {
@@ -100,20 +139,9 @@
 		margin-top: 4px;
 	}
 
-	.timetable-name {
-		font-size: 14px;
-		color: #1d2130;
-		font-weight: 600;
-		max-width: 150px;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-	}
-
 	.week-status {
-		margin-left: 6px;
-		font-size: 12px;
-		color: #8e92a3;
+		font-size: 15px;
+		color: #4a4d5e;
 		font-weight: 400;
 	}
 
@@ -121,31 +149,18 @@
 		display: flex;
 		flex-direction: row;
 		align-items: center;
-		margin-top: 4px;
-		background-color: rgba(255, 255, 255, 0.5);
-		padding: 4px 8px;
-		border-radius: 20px;
+		gap: 16px;
+		padding-top: 8px;
 	}
 
 	.header-tool {
-		margin-left: 12px;
-		width: 32px;
-		height: 32px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		transition: all 0.2s;
-		background-color: #fff;
-		border-radius: 50%;
-		box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-	}
-	
-	.header-tool:first-child {
-		margin-left: 0;
+		opacity: 0.8;
 	}
 	
 	.header-tool:active {
-		transform: scale(0.95);
-		box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+		opacity: 0.5;
 	}
 </style>
