@@ -15,6 +15,22 @@ export const createMineHandlers = ({ isLoggedIn, userInfo }) => {
 					userInfo.username = data.username || ''
 					userInfo.studentId = data.studentId || ''
 					userInfo.school = data.school || ''
+
+					if (!userInfo.school) {
+						uni.showModal({
+							title: '温馨提示',
+							content: '您尚未设置学校信息，请前往设置',
+							confirmText: '去设置',
+							cancelText: '暂不',
+							success: (res) => {
+								if (res.confirm) {
+									uni.navigateTo({
+										url: '/pages/mine/edit-profile'
+									})
+								}
+							}
+						})
+					}
 				}
 			},
 			fail: (err) => {

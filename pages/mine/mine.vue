@@ -4,7 +4,7 @@
 		<view class="status-bar"></view>
 
 		<!-- 内容区域 -->
-		<scroll-view class="content" scroll-y="true">
+		<scroll-view class="content" :scroll-y="isLoggedIn">
 			<view v-if="!isLoggedIn" class="auth-section">
 				<login-form @success="onLoginSuccess"></login-form>
 			</view>
@@ -19,20 +19,32 @@
 				
 				<view class="menu-list">
 					<view class="menu-item" @tap="navigateTo('/pages/schedule/timetable-manage')">
-						<text class="menu-text">课表管理</text>
-						<uni-icons type="right" size="16" color="#8e92a3"></uni-icons>
+						<view class="menu-left">
+							<uni-icons type="calendar" size="22" color="#007aff" class="menu-icon"></uni-icons>
+							<text class="menu-text">课表管理</text>
+						</view>
+						<uni-icons type="right" size="16" color="#c0c4cc"></uni-icons>
 					</view>
 					<view class="menu-item" @tap="navigateTo('/pages/schedule/course-library')">
-						<text class="menu-text">课程库</text>
-						<uni-icons type="right" size="16" color="#8e92a3"></uni-icons>
+						<view class="menu-left">
+							<uni-icons type="list" size="22" color="#007aff" class="menu-icon"></uni-icons>
+							<text class="menu-text">课程库</text>
+						</view>
+						<uni-icons type="right" size="16" color="#c0c4cc"></uni-icons>
 					</view>
 					<view class="menu-item" @tap="navigateToEdit">
-						<text class="menu-text">修改个人信息</text>
-						<uni-icons type="right" size="16" color="#8e92a3"></uni-icons>
+						<view class="menu-left">
+							<uni-icons type="gear" size="22" color="#007aff" class="menu-icon"></uni-icons>
+							<text class="menu-text">修改个人信息</text>
+						</view>
+						<uni-icons type="right" size="16" color="#c0c4cc"></uni-icons>
 					</view>
 					<view class="menu-item" @tap="handleLogout">
-						<text class="menu-text text-danger">退出登录</text>
-						<uni-icons type="right" size="16" color="#8e92a3"></uni-icons>
+						<view class="menu-left">
+							<uni-icons type="arrow-left" size="22" color="#ff4d4f" class="menu-icon"></uni-icons>
+							<text class="menu-text text-danger">退出登录</text>
+						</view>
+						<uni-icons type="right" size="16" color="#c0c4cc"></uni-icons>
 					</view>
 				</view>
 			</view>
@@ -72,7 +84,7 @@
 		display: flex;
 		flex-direction: column;
 		flex: 1;
-		background-color: #f1f3f8;
+		background-color: #ffffff; /* Unified white background */
 	}
 	
 	.status-bar {
@@ -82,39 +94,40 @@
 
 	.content {
 		flex: 1;
-		padding-bottom: 80px;
+		padding-bottom: 100px;
 	}
 	
 	.auth-section {
 		flex: 1;
 		display: flex;
 		justify-content: center;
-		padding-top: 40px;
 	}
 	
 	.mine-section {
-		padding: 20px;
+		padding: 0;
 	}
 	
 	.user-info {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		margin-bottom: 30px;
-		padding: 30px 0;
+		margin-bottom: 0; /* Remove bottom margin to connect with list */
+		padding: 60px 20px 40px; /* Increased top padding */
 	}
 	
 	.avatar {
-		width: 80px;
-		height: 80px;
-		border-radius: 40px;
+		width: 90px;
+		height: 90px;
+		border-radius: 50%;
 		margin-bottom: 16px;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 	}
 	
 	.username {
-		font-size: 20px;
+		font-size: 24px;
 		font-weight: 700;
 		color: #1d2130;
+		margin-bottom: 8px;
 	}
 
 	.sub-info {
@@ -125,8 +138,13 @@
 	
 	.menu-list {
 		background-color: #ffffff;
-		border-radius: 12px;
+		border-radius: 0;
+		display: flex;
+		flex-direction: column;
 		overflow: hidden;
+		box-shadow: none;
+		border-top: none; /* Remove border */
+		border-bottom: none; /* Remove border */
 	}
 	
 	.menu-item {
@@ -134,21 +152,44 @@
 		flex-direction: row;
 		justify-content: space-between;
 		align-items: center;
-		padding: 16px 20px;
-		border-bottom: 0.5px solid #f1f3f8;
+		padding: 18px 20px;
+		background-color: #ffffff;
+		transition: background-color 0.2s;
+		position: relative;
+	}
+
+	.menu-item::after {
+		content: '';
+		position: absolute;
+		bottom: 0;
+		left: 56px; /* Align with text, skipping icon padding */
+		right: 0;
+		height: 1px;
+		background-color: #f5f6f8;
+		transform: scaleY(0.5);
+	}
+
+	.menu-item:last-child::after {
+		display: none;
 	}
 
 	.menu-item:active {
 		background-color: #f9f9fb;
 	}
 	
-	.menu-item:last-child {
-		border-bottom: none;
+	.menu-left {
+		display: flex;
+		align-items: center;
+	}
+
+	.menu-icon {
+		margin-right: 14px;
 	}
 	
 	.menu-text {
 		font-size: 16px;
 		color: #1d2130;
+		font-weight: 500;
 	}
 
 	.text-danger {

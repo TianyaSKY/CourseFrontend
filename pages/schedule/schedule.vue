@@ -252,6 +252,19 @@
 }`
 
 	onShow(() => {
+		const token = uni.getStorageSync('token')
+		if (!token) {
+			uni.showToast({
+				title: '请先登录',
+				icon: 'none'
+			})
+			setTimeout(() => {
+				uni.redirectTo({
+					url: '/pages/mine/mine'
+				})
+			}, 1000)
+			return
+		}
 		loadData()
 	})
 
