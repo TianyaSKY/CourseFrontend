@@ -45,18 +45,18 @@
 							  :style="{ 
 								 gridRow: `${course.startPeriod} / span ${course.span}`, 
 								 gridColumn: course.dayOfWeek + 1,
-								 backgroundColor: getCourseColor(course.courseId)
+								 backgroundColor: getCourseColor(course.courseId || course.courseName)
 							  }"
 							  @tap.stop="handleCourseTap(course)">
 							<view class="course-card-inner">
-								<text class="course-name">{{ getCourseName(course.courseId) }}</text>
+								<text class="course-name">{{ getCourseName(course) }}</text>
 								<view class="course-detail">
-									<text class="course-location" v-if="getCourseBuilding(course.courseId) || course.buildingName">
-										@{{ getCourseBuilding(course.courseId) || course.buildingName }}
+									<text class="course-location" v-if="getCourseBuilding(course)">
+										@{{ getCourseBuilding(course) }}
 										<text v-if="course.roomNumber">{{ course.roomNumber }}</text>
 									</text>
-									<text class="course-teacher" v-if="getTeacherName(course.courseId)">
-										{{ getTeacherName(course.courseId) }}
+									<text class="course-teacher" v-if="getTeacherName(course)">
+										{{ getTeacherName(course) }}
 									</text>
 								</view>
 							</view>
@@ -69,13 +69,14 @@
 </template>
 
 <script setup>
-	import { ref, computed } from 'vue'
+	import { ref, computed, watch } from 'vue'
 
 	// --- Props & Emits ---
 	const props = defineProps({
 		timetable: { type: Object, required: true },
 		courses: { type: Array, default: () => [] },
-		schedules: { type: Array, default: () => [] }
+		schedules: { type: Array, default: () => [] },
+		currentViewDate: { type: String, default: '' }
 	})
 
 	const emit = defineEmits(['cell-tap', 'week-change'])
@@ -101,36 +102,51 @@
 	])
 
 	// --- State ---
-	const weekOffset = ref(0)
+	const getWeekMonday = (dateInput) => {
+		const base = dateInput ? new Date(dateInput) : new Date()
+		if (isNaN(base.getTime())) return new Date()
+		const day = base.getDay()
+		const diffToMonday = day === 0 ? 6 : day - 1
+		const monday = new Date(base)
+		monday.setDate(base.getDate() - diffToMonday)
+		monday.setHours(0, 0, 0, 0)
+		return monday
+	}
+
+	const formatDate = (date) => {
+		const year = date.getFullYear()
+		const month = String(date.getMonth() + 1).padStart(2, '0')
+		const day = String(date.getDate()).padStart(2, '0')
+		return `${year}-${month}-${day}`
+	}
+
+	const currentMonday = ref(getWeekMonday(props.currentViewDate))
 	const touchStartX = ref(0)
 	const touchStartY = ref(0)
 	const animClass = ref('')
 	const isAnimating = ref(false)
 
+	watch(() => props.currentViewDate, (value) => {
+		if (!value) return
+		currentMonday.value = getWeekMonday(value)
+	})
+
 	// --- Date Logic ---
 	const currentMonth = computed(() => {
-		const now = new Date()
-		const day = now.getDay()
-		const diffToMonday = now.getDate() - (day === 0 ? 6 : day - 1) + (weekOffset.value * 7)
-		const date = new Date(now.getFullYear(), now.getMonth(), diffToMonday)
+		const date = currentMonday.value
 		return date.getMonth() + 1
 	})
 
 	const weekDates = computed(() => {
-		const now = new Date()
-		const day = now.getDay()
-		const diffToMonday = now.getDate() - (day === 0 ? 6 : day - 1) + (weekOffset.value * 7)
-		const monday = new Date(now.getFullYear(), now.getMonth(), diffToMonday)
+		const monday = new Date(currentMonday.value)
 		
 		return Array.from({ length: 7 }, (_, i) => {
 			const d = new Date(monday)
 			d.setDate(monday.getDate() + i)
-			const year = d.getFullYear()
-			const month = String(d.getMonth() + 1).padStart(2, '0')
 			const date = String(d.getDate())
 			return {
 				date: date,
-				fullDate: `${year}-${month}-${date.padStart(2, '0')}`,
+				fullDate: formatDate(d),
 				isToday: d.toDateString() === new Date().toDateString()
 			}
 		})
@@ -180,9 +196,21 @@
 	})
 
 	// --- Helpers ---
-	const getCourseName = (id) => props.courses.find(c => c.id === id)?.name || '未知课程'
-	const getTeacherName = (id) => props.courses.find(c => c.id === id)?.teacherName || ''
-	const getCourseBuilding = (id) => props.courses.find(c => c.id === id)?.locationName || ''
+	const getCourseName = (course) => {
+		if (course?.courseName) return course.courseName
+		return props.courses.find(c => c.id === course?.courseId)?.name || '未知课程'
+	}
+
+	const getTeacherName = (course) => {
+		if (course?.teacherName) return course.teacherName
+		return props.courses.find(c => c.id === course?.courseId)?.teacherName || ''
+	}
+
+	const getCourseBuilding = (course) => {
+		if (course?.locationName) return course.locationName
+		if (course?.buildingName) return course.buildingName
+		return props.courses.find(c => c.id === course?.courseId)?.locationName || ''
+	}
 	
 	const getCourseColor = (courseId) => {
 		if (!courseId) return colors[0]
@@ -192,8 +220,10 @@
 
 	// --- Interaction Handlers ---
 	const changeWeek = (delta) => {
-		weekOffset.value += delta
-		const mondayDate = weekDates.value[0]?.fullDate
+		const monday = new Date(currentMonday.value)
+		monday.setDate(monday.getDate() + (delta * 7))
+		currentMonday.value = monday
+		const mondayDate = formatDate(monday)
 		if (mondayDate) emit('week-change', { mondayDate })
 	}
 

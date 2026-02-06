@@ -51,13 +51,15 @@
 		}
 	})
 
-	const emit = defineEmits(['import', 'share'])
+	const emit = defineEmits(['import', 'share', 'more'])
 
 	const handleToolClick = (type) => {
 		if (type === 'import') {
 			emit('import')
 		} else if (type === 'share') {
 			emit('share')
+		} else if (type === 'more') {
+			emit('more')
 		} else {
 			onTool(type)
 		}
@@ -159,7 +161,7 @@
 		justify-content: center;
 		opacity: 0.8;
 	}
-	
+
 	.header-tool:active {
 		opacity: 0.5;
 	}

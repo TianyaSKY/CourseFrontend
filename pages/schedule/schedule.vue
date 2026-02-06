@@ -1,7 +1,7 @@
 <template>
 	<view class="page">
 		<!-- 课表页独享工具栏 -->
-		<schedule-header :timetable="currentTimetable" :current-view-date="currentViewDate" @import="handleImport" @share="handleHeaderShare"></schedule-header>
+		<schedule-header :timetable="currentTimetable" :current-view-date="currentViewDate" @import="handleImport" @share="handleHeaderShare" @more="openMoreOptionsModal"></schedule-header>
 
 		<!-- 内容区域 -->
 		<view class="content">
@@ -12,6 +12,7 @@
 				:timetable="currentTimetable" 
 				:courses="courses"
 				:schedules="schedules"
+				:current-view-date="currentViewDate"
 				@cell-tap="handleCellTap"
 				@week-change="handleWeekChange"
 			></schedule-board>
@@ -185,6 +186,32 @@
 				</view>
 			</view>
 		</view>
+
+		<!-- More Options Modal -->
+		<view v-if="showMoreOptionsModal" class="modal-overlay" @tap="closeMoreOptionsModal">
+			<view class="modal more-modal" @tap.stop>
+				<text class="modal-title">跳转周次</text>
+				<view class="more-options">
+					<text class="week-value">第 {{ jumpWeek }} 周</text>
+					<slider
+						class="week-slider"
+						:min="1"
+						:max="maxWeek"
+						:step="1"
+						:value="jumpWeek"
+						:show-value="false"
+						activeColor="#007aff"
+						backgroundColor="#d7e4f8"
+						block-color="#007aff"
+						@change="onJumpWeekChange"
+					/>
+				</view>
+				<view class="modal-footer">
+					<button class="modal-btn cancel" @tap="closeMoreOptionsModal">取消</button>
+					<button class="modal-btn confirm" @tap="confirmJumpWeek">跳转</button>
+				</view>
+			</view>
+		</view>
 	</view>
 </template>
 
@@ -221,6 +248,43 @@
 	const showShareOutputModal = ref(false)
 	const shareToken = ref('')
 	const expirationTime = ref('')
+	const showMoreOptionsModal = ref(false)
+	const jumpWeek = ref(1)
+
+	const maxWeek = computed(() => {
+		const totalWeeks = Number(currentTimetable.value?.totalWeeks)
+		if (totalWeeks > 0) return totalWeeks
+		return 30
+	})
+
+	const getWeekMonday = (dateInput) => {
+		const base = dateInput ? new Date(dateInput) : new Date()
+		if (isNaN(base.getTime())) return new Date()
+		const day = base.getDay()
+		const diffToMonday = day === 0 ? 6 : day - 1
+		const monday = new Date(base)
+		monday.setDate(base.getDate() - diffToMonday)
+		monday.setHours(0, 0, 0, 0)
+		return monday
+	}
+
+	const formatDate = (date) => {
+		const year = date.getFullYear()
+		const month = String(date.getMonth() + 1).padStart(2, '0')
+		const day = String(date.getDate()).padStart(2, '0')
+		return `${year}-${month}-${day}`
+	}
+
+	const currentWeekValue = computed(() => {
+		if (!currentTimetable.value?.termStartDate) return 1
+		const termMonday = getWeekMonday(currentTimetable.value.termStartDate)
+		const viewMonday = getWeekMonday(currentViewDate.value)
+		const diffTime = viewMonday.getTime() - termMonday.getTime()
+		const week = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 7)) + 1
+		if (week < 1) return 1
+		if (week > maxWeek.value) return maxWeek.value
+		return week
+	})
 	
 	const AI_PROMPT = `你是一个智能课表解析助手。请仔细分析提供的课表图片（或文本），提取课程信息。
 **只输出 JSON，不要任何 Markdown 标记或额外文字**。
@@ -538,6 +602,35 @@
 		showShareOutputModal.value = false
 		shareToken.value = ''
 		expirationTime.value = ''
+	}
+
+	const openMoreOptionsModal = () => {
+		jumpWeek.value = currentWeekValue.value
+		showMoreOptionsModal.value = true
+	}
+
+	const closeMoreOptionsModal = () => {
+		showMoreOptionsModal.value = false
+	}
+
+	const onJumpWeekChange = (e) => {
+		jumpWeek.value = Number(e.detail.value) || 1
+	}
+
+	const confirmJumpWeek = () => {
+		if (!currentTimetable.value?.termStartDate) {
+			uni.showToast({ title: '请先设置课表学期', icon: 'none' })
+			return
+		}
+
+		const week = Math.min(Math.max(jumpWeek.value, 1), maxWeek.value)
+		const termMonday = getWeekMonday(currentTimetable.value.termStartDate)
+		const targetMonday = new Date(termMonday)
+		targetMonday.setDate(termMonday.getDate() + (week - 1) * 7)
+		const mondayDate = formatDate(targetMonday)
+		currentWeekMonday.value = mondayDate
+		loadSchedulesByWeek(mondayDate)
+		closeMoreOptionsModal()
 	}
 </script>
 
@@ -873,4 +966,27 @@
 		color: #ff9800;
 		text-align: center;
 	}
+
+	.more-modal {
+		width: 280px;
+	}
+
+	.more-options {
+		display: flex;
+		flex-direction: column;
+		margin-bottom: 14px;
+		gap: 10px;
+	}
+
+	.week-value {
+		font-size: 16px;
+		font-weight: 600;
+		color: #1d2130;
+		text-align: center;
+	}
+
+	.week-slider {
+		width: 100%;
+	}
+
 </style>
