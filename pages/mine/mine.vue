@@ -79,72 +79,83 @@
 	})
 </script>
 
-<style>
+<style scoped>
 	.page {
 		display: flex;
 		flex-direction: column;
 		flex: 1;
-		background-color: #ffffff; /* Unified white background */
+		background-color: #eef3f8;
 	}
 	
 	.status-bar {
 		height: var(--status-bar-height);
 		width: 100%;
+		background-color: #123a64;
 	}
 
 	.content {
 		flex: 1;
 		padding-bottom: 100px;
+		background: linear-gradient(180deg, #123a64 0, #1d4d7d 220px, #eef3f8 220px, #eef3f8 100%);
 	}
 	
 	.auth-section {
 		flex: 1;
 		display: flex;
 		justify-content: center;
+		align-items: center;
 	}
 	
 	.mine-section {
-		padding: 0;
+		display: flex;
+		flex-direction: column;
+		padding-bottom: 24px;
 	}
 	
 	.user-info {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		margin-bottom: 0; /* Remove bottom margin to connect with list */
-		padding: 60px 20px 40px; /* Increased top padding */
+		padding: 20px 20px 36px;
+		margin-bottom: 0;
+		background-color: transparent;
 	}
 	
 	.avatar {
-		width: 90px;
-		height: 90px;
+		width: 80px;
+		height: 80px;
 		border-radius: 50%;
-		margin-bottom: 16px;
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+		margin-bottom: 12px;
+		border: 3px solid rgba(255, 255, 255, 0.36);
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
 	}
 	
 	.username {
-		font-size: 24px;
-		font-weight: 700;
-		color: #1d2130;
-		margin-bottom: 8px;
+		font-size: 20px;
+		font-weight: 600;
+		color: #ffffff;
+		margin-bottom: 4px;
 	}
 
 	.sub-info {
-		font-size: 14px;
-		color: #8e92a3;
-		margin-top: 4px;
+		font-size: 13px;
+		color: rgba(255, 255, 255, 0.8);
+		margin-top: 2px;
 	}
 	
 	.menu-list {
-		background-color: #ffffff;
-		border-radius: 0;
+		background-color: rgba(255, 255, 255, 0.72);
+		margin: 0;
 		display: flex;
 		flex-direction: column;
 		overflow: hidden;
-		box-shadow: none;
-		border-top: none; /* Remove border */
-		border-bottom: none; /* Remove border */
+		box-shadow: 0 8px 18px rgba(20, 52, 86, 0.08);
+		position: relative;
+		z-index: 1;
+		border-top: 1px solid rgba(255, 255, 255, 0.6);
+		border-bottom: 1px solid rgba(20, 52, 86, 0.12);
+		backdrop-filter: blur(10px);
+		-webkit-backdrop-filter: blur(10px);
 	}
 	
 	.menu-item {
@@ -153,7 +164,7 @@
 		justify-content: space-between;
 		align-items: center;
 		padding: 18px 20px;
-		background-color: #ffffff;
+		background-color: transparent;
 		transition: background-color 0.2s;
 		position: relative;
 	}
@@ -162,10 +173,10 @@
 		content: '';
 		position: absolute;
 		bottom: 0;
-		left: 56px; /* Align with text, skipping icon padding */
+		left: 56px;
 		right: 0;
 		height: 1px;
-		background-color: #f5f6f8;
+		background-color: rgba(26, 58, 94, 0.1);
 		transform: scaleY(0.5);
 	}
 
@@ -174,7 +185,7 @@
 	}
 
 	.menu-item:active {
-		background-color: #f9f9fb;
+		background-color: rgba(26, 58, 94, 0.08);
 	}
 	
 	.menu-left {
@@ -183,12 +194,12 @@
 	}
 
 	.menu-icon {
-		margin-right: 14px;
+		margin-right: 12px;
 	}
 	
 	.menu-text {
-		font-size: 16px;
-		color: #1d2130;
+		font-size: 15px;
+		color: #0e2d4b;
 		font-weight: 500;
 	}
 

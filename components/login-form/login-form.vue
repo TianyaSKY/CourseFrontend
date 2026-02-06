@@ -7,20 +7,42 @@
 		</view>
 
 		<view class="login-card">
-			<view class="input-group">
-				<text class="label">用户名</text>
-				<view class="input-box">
-					<uni-icons type="person" size="20" color="#ffffff" class="input-icon"></uni-icons>
-					<input class="input" type="text" v-model="username" placeholder="请输入用户名" placeholder-class="placeholder" />
+			<view class="inputs-panel">
+				<view class="input-group">
+					<text class="label">用户名</text>
+					<view class="input-box">
+						<uni-icons type="person" size="20" color="#ffffff" class="input-icon"></uni-icons>
+						<input class="input" type="text" v-model="username" placeholder="请输入用户名" placeholder-class="placeholder" />
+					</view>
 				</view>
-			</view>
-			
-			<view class="input-group">
-				<text class="label">密码</text>
-				<view class="input-box">
-					<uni-icons type="locked" size="20" color="#ffffff" class="input-icon"></uni-icons>
-					<input class="input" type="password" v-model="password" placeholder="请输入密码" placeholder-class="placeholder" />
+				
+				<view class="input-group">
+					<text class="label">密码</text>
+					<view class="input-box">
+						<uni-icons type="locked" size="20" color="#ffffff" class="input-icon"></uni-icons>
+						<input class="input" type="password" v-model="password" placeholder="请输入密码" placeholder-class="placeholder" />
+					</view>
 				</view>
+				
+				<template v-if="!isLogin">
+					<view class="input-group">
+						<text class="label">学号</text>
+						<view class="input-box">
+							<uni-icons type="contact" size="20" color="#ffffff" class="input-icon"></uni-icons>
+							<input class="input" type="text" v-model="studentId" placeholder="请输入学号" placeholder-class="placeholder" />
+						</view>
+					</view>
+					
+					<view class="input-group">
+						<text class="label">学校</text>
+						<view class="input-box" @tap="showSchoolSelect = true">
+							<uni-icons type="home" size="20" color="#ffffff" class="input-icon"></uni-icons>
+							<text v-if="!selectedSchoolName" class="placeholder" style="font-size: 16px;">请选择学校</text>
+							<text v-else class="input" style="line-height: 52px">{{ selectedSchoolName }}</text>
+							<uni-icons type="right" size="16" color="rgba(255,255,255,0.6)" style="margin-left: auto;"></uni-icons>
+						</view>
+					</view>
+				</template>
 			</view>
 			
 			<button class="submit-btn" :loading="loading" @tap="handleSubmit" hover-class="submit-btn-hover">
@@ -34,23 +56,43 @@
 				</text>
 			</view>
 		</view>
+		
+		<!-- School Select Component -->
+		<school-select 
+			v-model:show="showSchoolSelect" 
+			v-model="schoolId"
+			@change="onSchoolSelect"
+		></school-select>
 	</view>
 </template>
 
 <script setup>
 	import { ref } from 'vue'
 	import { createLoginHandlers } from '@/functions/login-form.js'
+	import SchoolSelect from '@/components/school-select/school-select.vue'
 
 	const username = ref('')
 	const password = ref('')
+	const studentId = ref('')
+	const schoolId = ref(null)
+	const selectedSchoolName = ref('')
+	const showSchoolSelect = ref(false)
+	
 	const isLogin = ref(true)
 	const loading = ref(false)
 
 	const emit = defineEmits(['success'])
 
+	const onSchoolSelect = (school) => {
+		selectedSchoolName.value = school.name
+		schoolId.value = school.id
+	}
+
 	const { toggleMode, handleSubmit } = createLoginHandlers({
 		username,
 		password,
+		studentId,
+		schoolId,
 		isLogin,
 		loading,
 		emit
@@ -105,8 +147,25 @@
 		/* box-shadow removed */
 	}
 
+	.inputs-panel {
+		width: calc(100% + 48px);
+		margin: 0 -24px;
+		padding: 14px 0;
+		border-radius: 2px;
+		background-color: rgba(0, 0, 0, 0.24);
+		border-top: 1px solid rgba(255, 255, 255, 0.26);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+		backdrop-filter: blur(8px);
+		-webkit-backdrop-filter: blur(8px);
+	}
+
 	.input-group {
-		margin-bottom: 24px;
+		margin-bottom: 20px;
+		padding: 0 14px;
+	}
+
+	.input-group:last-child {
+		margin-bottom: 0;
 	}
 
 	.label {

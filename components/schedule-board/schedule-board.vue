@@ -17,7 +17,7 @@
 					</view>
 				</view>
 
-				<scroll-view class="schedule-area" scroll-y>
+				<view class="schedule-area">
 					<view class="schedule-grid">
 						<!-- 1. Time Axis -->
 						<view v-for="p in periodList" :key="'time-'+p.index" 
@@ -62,7 +62,7 @@
 							</view>
 						</view>
 					</view>
-				</scroll-view>
+				</view>
 			</view>
 		</view>
 	</view>
@@ -259,11 +259,12 @@
 <style scoped>
 	.schedule-board {
 		margin-top: 0;
-		background-color: transparent;
-		padding: 0 2px;
+		background-color: #f7fbff;
+		padding: 0;
 		display: flex;
 		flex-direction: column;
 		flex: 1;
+		min-height: 0;
 	}
 
 	.week-item-container {
@@ -271,6 +272,7 @@
 		flex-direction: column;
 		flex: 1;
 		overflow: hidden;
+		min-height: 0;
 	}
 	
 	.anim-wrapper {
@@ -279,6 +281,7 @@
 		flex: 1;
 		width: 100%;
 		transition: transform 0.2s ease, opacity 0.2s ease;
+		min-height: 0;
 	}
 	
 	/* Animation States */
@@ -293,6 +296,9 @@
 	.week-row {
 		display: flex;
 		align-items: center;
+		background-color: rgba(16, 55, 92, 0.06);
+		border-top: 1px solid rgba(16, 55, 92, 0.12);
+		border-bottom: 1px solid rgba(16, 55, 92, 0.1);
 		padding-bottom: 8px;
 		margin-bottom: 0;
 	}
@@ -353,17 +359,22 @@
 	/* Scroll Area */
 	.schedule-area {
 		flex: 1;
-		height: 0; 
-		min-height: 500px;
+		min-height: 0;
+		background-color: #f7fbff;
+		overflow-y: auto;
+		overflow-x: hidden;
 	}
 
 	.schedule-grid {
 		display: grid;
 		grid-template-columns: 28px repeat(7, 1fr);
 		grid-template-rows: repeat(12, 64px);
-		gap: 2px;
+		gap: 0;
 		padding-top: 4px;
 		padding-bottom: 20px;
+		background-color: #f7fbff;
+		box-sizing: border-box;
+		width: 100%;
 	}
 
 	/* Time Column */
@@ -401,6 +412,8 @@
 	/* Grid Cells */
 	.grid-cell {
 		box-sizing: border-box;
+		background-color: transparent;
+		border: none;
 	}
 	
 	/* Course Cards */

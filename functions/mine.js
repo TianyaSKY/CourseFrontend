@@ -1,42 +1,31 @@
-import { BASE_URL } from '@/config.js'
+import { getCurrentUser } from '@/functions/user.js'
 
 export const createMineHandlers = ({ isLoggedIn, userInfo }) => {
-	const fetchUserInfo = () => {
-		const token = uni.getStorageSync('token')
-		uni.request({
-			url: `${BASE_URL}/api/users/current`,
-			method: 'GET',
-			header: {
-				Authorization: `Bearer ${token}`
-			},
-			success: (res) => {
-				if (res.statusCode == 200) {
-					const data = res.data
-					userInfo.username = data.username || ''
-					userInfo.studentId = data.studentId || ''
-					userInfo.school = data.school || ''
+	const fetchUserInfo = async () => {
+		try {
+			const data = await getCurrentUser()
+			userInfo.username = data.username || ''
+			userInfo.studentId = data.studentId || ''
+			userInfo.school = data.school || ''
 
-					if (!userInfo.school) {
-						uni.showModal({
-							title: '温馨提示',
-							content: '您尚未设置学校信息，请前往设置',
-							confirmText: '去设置',
-							cancelText: '暂不',
-							success: (res) => {
-								if (res.confirm) {
-									uni.navigateTo({
-										url: '/pages/mine/edit-profile'
-									})
-								}
-							}
-						})
+			if (!userInfo.school) {
+				uni.showModal({
+					title: '温馨提示',
+					content: '您尚未设置学校信息，请前往设置',
+					confirmText: '去设置',
+					cancelText: '暂不',
+					success: (res) => {
+						if (res.confirm) {
+							uni.navigateTo({
+								url: '/pages/mine/edit-profile'
+							})
+						}
 					}
-				}
-			},
-			fail: (err) => {
-				console.error('获取用户信息失败:', err)
+				})
 			}
-		})
+		} catch (err) {
+			console.error('获取用户信息失败:', err)
+		}
 	}
 
 	const checkLoginStatus = () => {
@@ -49,8 +38,9 @@ export const createMineHandlers = ({ isLoggedIn, userInfo }) => {
 	}
 
 	const onLoginSuccess = () => {
+		console.log('Login success handler triggered')
 		isLoggedIn.value = true
-		checkLoginStatus()
+		fetchUserInfo()
 	}
 
 	const navigateToEdit = () => {

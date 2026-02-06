@@ -21,3 +21,14 @@ export const updateCurrentUser = (data) => {
     data: data
   })
 }
+
+/**
+ * 按 ID 获取用户
+ * @param {number} id 
+ */
+export const getUserById = (id) => {
+  return request({
+    url: `/api/users/${id}`,
+    method: 'GET'
+  })
+}

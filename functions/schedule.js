@@ -74,3 +74,48 @@ export const getUserScheduleByDate = (userId, date) => {
     method: 'GET'
   })
 }
+
+/**
+ * 获取用户完整排课
+ * @param {number} userId 
+ */
+export const getUserScheduleFull = (userId) => {
+  return request({
+    url: `/api/schedules/user/${userId}/full`,
+    method: 'GET'
+  })
+}
+
+/**
+ * 按周几获取用户排课
+ * @param {number} userId 
+ * @param {number} dayOfWeek (1-7)
+ */
+export const getUserScheduleByDay = (userId, dayOfWeek) => {
+  return request({
+    url: `/api/schedules/user/${userId}/day/${dayOfWeek}`,
+    method: 'GET'
+  })
+}
+
+/**
+ * 按日期获取排课 (通用)
+ * @param {string} date 
+ */
+export const getSchedulesByDate = (date) => {
+  return request({
+    url: `/api/schedules/date/${date}`,
+    method: 'GET'
+  })
+}
+
+/**
+ * 获取指定课程的所有排课
+ * @param {number} courseId 
+ */
+export const getSchedulesByCourse = (courseId) => {
+  return request({
+    url: `/api/schedules/course/${courseId}`,
+    method: 'GET'
+  })
+}

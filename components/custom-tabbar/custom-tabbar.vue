@@ -31,10 +31,10 @@
 		flex-direction: row;
 		justify-content: space-around;
 		align-items: center;
-		height: 56px;
+		height: 60px; /* Slightly taller for better touch targets */
 		padding-bottom: env(safe-area-inset-bottom);
-		background-color: #dae4f5; /* Match page background */
-		/* border-top: 0.5px solid rgba(0, 0, 0, 0.08); */ /* Removed border for cleaner look */
+		background-color: #ffffff; /* Changed to White */
+		box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05); /* Added subtle shadow */
 		z-index: 999;
 	}
 

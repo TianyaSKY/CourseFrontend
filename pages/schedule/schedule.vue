@@ -4,7 +4,7 @@
 		<schedule-header :timetable="currentTimetable" :current-view-date="currentViewDate" @import="handleImport" @share="handleHeaderShare"></schedule-header>
 
 		<!-- 内容区域 -->
-		<scroll-view class="content" scroll-y="true">
+		<view class="content">
 			<view class="view-container">
 			<!-- 课表内容 -->
 			<schedule-board 
@@ -19,7 +19,7 @@
 					<text class="placeholder-text">暂无课表或未设置默认课表，请点击上方“+”创建</text>
 				</view>
 			</view>
-		</scroll-view>
+		</view>
 
 		<!-- 公用底部菜单栏 -->
 		<custom-tabbar currentTab="schedule"></custom-tabbar>
@@ -96,7 +96,7 @@
 							<uni-icons type="left" size="20" color="#1d2130"></uni-icons>
 							<text>返回</text>
 						</view>
-						<text class="modal-title-small">{{ importMode === 'image' ? '图片导入' : (importMode === 'json' ? 'JSON 导入' : (importMode === 'share' ? '口令导入' : '文本导入')) }}</text>>
+						<text class="modal-title-small">{{ importMode === 'image' ? '图片导入' : (importMode === 'json' ? 'JSON 导入' : (importMode === 'share' ? '口令导入' : '文本导入')) }}</text>
 						<view class="placeholder-icon"></view>
 					</view>
 					
@@ -541,7 +541,7 @@
 	}
 </script>
 
-<style>
+<style scoped>
 	.page {
 		display: flex;
 		flex-direction: column;
@@ -552,10 +552,15 @@
 	.content {
 		flex: 1;
 		padding-bottom: 80px;
+		overflow: hidden;
+		min-height: 0;
 	}
 	
 	.view-container {
-		padding: 0 20px;
+		padding: 0;
+		height: 100%;
+		box-sizing: border-box;
+		overflow: hidden;
 	}
 	
 	.empty-state {

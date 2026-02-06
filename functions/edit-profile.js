@@ -1,4 +1,5 @@
-import { BASE_URL } from '@/config.js'
+import { getAllSchools } from '@/functions/school.js'
+import { getCurrentUser, updateCurrentUser } from '@/functions/user.js'
 
 export const createEditProfileHandlers = ({
 	form,
@@ -8,64 +9,46 @@ export const createEditProfileHandlers = ({
 	lngStr,
 	loading
 }) => {
-	const fetchSchoolList = () => {
-		const token = uni.getStorageSync('token')
-		uni.request({
-			url: `${BASE_URL}/api/schools`,
-			method: 'GET',
-			header: {
-				Authorization: `Bearer ${token}`
-			},
-			success: (res) => {
-				if (res.statusCode == 200) {
-					schoolList.value = res.data || []
-				}
-			},
-			fail: () => {
-				uni.showToast({
-					title: '获取学校列表失败',
-					icon: 'none'
-				})
-			}
-		})
+	const fetchSchoolList = async () => {
+		try {
+			const data = await getAllSchools()
+			schoolList.value = data || []
+		} catch (e) {
+			uni.showToast({
+				title: '获取学校列表失败',
+				icon: 'none'
+			})
+		}
 	}
 
-	const fetchUserInfo = () => {
-		const token = uni.getStorageSync('token')
-		uni.request({
-			url: `${BASE_URL}/api/users/current`,
-			method: 'GET',
-			header: {
-				Authorization: `Bearer ${token}`
-			},
-			success: (res) => {
-				if (res.statusCode == 200) {
-					const data = res.data
-					form.username = data.username
-					form.studentId = data.studentId != null ? data.studentId : ''
-					const sId = data.schoolId
-					if (sId != null) {
-						form.schoolId = sId
-						const index = schoolList.value.findIndex((school) => school.id === sId)
-						if (index >= 0) {
-							selectedSchoolIndex.value = index
-						}
-					}
-
-					const lat = data.homeLocationLat
-					if (lat != null) {
-						form.homeLocationLat = lat
-						latStr.value = lat.toString()
-					}
-
-					const lng = data.homeLocationLng
-					if (lng != null) {
-						form.homeLocationLng = lng
-						lngStr.value = lng.toString()
-					}
+	const fetchUserInfo = async () => {
+		try {
+			const data = await getCurrentUser()
+			form.username = data.username
+			form.studentId = data.studentId != null ? data.studentId : ''
+			const sId = data.schoolId
+			if (sId != null) {
+				form.schoolId = sId
+				const index = schoolList.value.findIndex((school) => school.id === sId)
+				if (index >= 0) {
+					selectedSchoolIndex.value = index
 				}
 			}
-		})
+
+			const lat = data.homeLocationLat
+			if (lat != null) {
+				form.homeLocationLat = lat
+				latStr.value = lat.toString()
+			}
+
+			const lng = data.homeLocationLng
+			if (lng != null) {
+				form.homeLocationLng = lng
+				lngStr.value = lng.toString()
+			}
+		} catch (e) {
+			// Error handled in request.js
+		}
 	}
 
 	const initEditProfile = () => {
@@ -96,7 +79,7 @@ export const createEditProfileHandlers = ({
 		uni.navigateBack()
 	}
 
-	const handleSave = () => {
+	const handleSave = async () => {
 		loading.value = true
 
 		const latNum = parseFloat(latStr.value)
@@ -117,40 +100,20 @@ export const createEditProfileHandlers = ({
 			updateData.password = form.password
 		}
 
-		const token = uni.getStorageSync('token')
-		uni.request({
-			url: `${BASE_URL}/api/users/current`,
-			method: 'PUT',
-			header: {
-				Authorization: `Bearer ${token}`
-			},
-			data: updateData,
-			success: (res) => {
-				if (res.statusCode == 200) {
-					uni.showToast({
-						title: '修改成功',
-						icon: 'success'
-					})
-					setTimeout(() => {
-						uni.navigateBack()
-					}, 1000)
-				} else {
-					uni.showToast({
-						title: '修改失败',
-						icon: 'none'
-					})
-				}
-			},
-			fail: () => {
-				uni.showToast({
-					title: '网络请求失败',
-					icon: 'none'
-				})
-			},
-			complete: () => {
-				loading.value = false
-			}
-		})
+		try {
+			await updateCurrentUser(updateData)
+			uni.showToast({
+				title: '修改成功',
+				icon: 'success'
+			})
+			setTimeout(() => {
+				uni.navigateBack()
+			}, 1000)
+		} catch (e) {
+			// Error handled in request.js
+		} finally {
+			loading.value = false
+		}
 	}
 
 	return {
